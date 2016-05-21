@@ -16,12 +16,15 @@ const (
 	CoordDirectionWest  CoordDirection = false
 )
 
+// LatString will return the direction string for latitude (N or S)
 func (c CoordDirection) LatString() string {
 	if c == CoordDirectionNorth {
 		return "N"
 	}
 	return "S"
 }
+
+// LongString will return the direction string for longitude (E or W)
 func (c CoordDirection) LongString() string {
 	if c == CoordDirectionEast {
 		return "E"
