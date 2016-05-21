@@ -52,9 +52,9 @@ func (g GPGSA) String() string {
 		copy(r.Fields[2:14], g.Satellites)
 	}
 
-	r.Fields[14] = strconv.FormatFloat(g.PDOP, 'f', 5, 64)
-	r.Fields[15] = strconv.FormatFloat(g.HDOP, 'f', 5, 64)
-	r.Fields[16] = strconv.FormatFloat(g.VDOP, 'f', 5, 64)
+	r.Fields[14] = strconv.FormatFloat(g.PDOP, 'f', -1, 64)
+	r.Fields[15] = strconv.FormatFloat(g.HDOP, 'f', -1, 64)
+	r.Fields[16] = strconv.FormatFloat(g.VDOP, 'f', -1, 64)
 
 	return r.String()
 }
