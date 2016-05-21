@@ -35,7 +35,7 @@ func (r Raw) String() string {
 	}
 	check := Checksum([]byte(data))
 
-	return "$" + data + "*" + string(check/16+48) + string(check%16+48)
+	return fmt.Sprintf("$%s*%02X", data, check)
 }
 
 // Checksum will calculate a NMEA checksum of data
@@ -58,7 +58,8 @@ func ParseRaw(line []byte) (*Raw, error) {
 	}
 	line = line[1:]
 	if len(line) >= 3 && line[len(line)-3] == '*' {
-		check := byte((line[len(line)-2]-48)*16 + (line[len(line)-1] - 48))
+		checkStr := bytes.ToUpper(line[len(line)-2:])
+		check := byte((checkStr[0]-48)*16 + (checkStr[1] - 48))
 		line = line[:len(line)-3]
 		if Checksum(line) != check {
 			return nil, fmt.Errorf("checksum: expected 0x%02x but found 0x%02x", Checksum(line), check)

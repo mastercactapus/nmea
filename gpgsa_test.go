@@ -25,3 +25,16 @@ func TestGPGSA_Parse(t *testing.T) {
 	assert.Equal(t, g.VDOP, 0.84, "VDOP")
 	assert.EqualValues(t, g.Satellites, []string{"03", "06", "19", "24", "12", "28", "01", "17"})
 }
+
+func TestGPGSA_String(t *testing.T) {
+	str := GPGSA{
+		AutoSelection: false,
+		FixType:       GPGSAFix2D,
+		PDOP:          1.5,
+		HDOP:          2.8,
+		VDOP:          6.2,
+		Satellites:    []string{"01", "02", "09"},
+	}.String()
+
+	assert.Equal(t, "$GPGSA,M,2,01,02,09,,,,,,,,,,1.5,2.8,6.2*3F", str)
+}
