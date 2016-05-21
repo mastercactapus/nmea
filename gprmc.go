@@ -12,6 +12,7 @@ const dateFormat = "020106"
 // GPRMCFix (fix type for GPRMC) was added in NMEA version 2.3 and indicates the kind of fix the receiver currently has. Only Autonomous and Differential represent a valid (Active) signal
 type GPRMCFix string
 
+// Fix types for GPRMC
 const (
 	GPRMCFixUnspecified  GPRMCFix = ""
 	GPRMCFixAutonomous   GPRMCFix = "A"
@@ -45,6 +46,7 @@ type GPRMC struct {
 	FixType GPRMCFix
 }
 
+// Type returns TypeGPRMC to fulfill the Sentence interface
 func (g GPRMC) Type() Type {
 	return TypeGPRMC
 }
@@ -76,6 +78,39 @@ func (g GPRMC) String() string {
 	}.String()
 }
 
+func parseFieldCoord(val, dirStr, typeName string) (Coord, error) {
+	var dir CoordDirection
+	if val != "" {
+		if typeName == "latitude" {
+			switch dirStr {
+			case "N":
+				dir = CoordDirectionNorth
+			case "S":
+				dir = CoordDirectionSouth
+			default:
+				return 0, fmt.Errorf("invalid or missing direction for %s", typeName)
+			}
+		} else {
+			switch dirStr {
+			case "E":
+				dir = CoordDirectionEast
+			case "W":
+				dir = CoordDirectionWest
+			default:
+				return 0, fmt.Errorf("invalid or missing direction for %s", typeName)
+			}
+		}
+		c, err := ParseCoord(val, dir)
+		if err != nil {
+			return 0, fmt.Errorf("parse %s: %s", typeName, err)
+		}
+		return c, nil
+	} else if dirStr != "" {
+		return 0, fmt.Errorf("got direction for %s, but no %s value", typeName, typeName)
+	}
+	return 0, nil
+}
+
 // Parse will parse GPRMC data from a raw sentence struct
 func (g *GPRMC) Parse(r *Raw) error {
 	if r.TypeName != string(TypeGPRMC) {
@@ -88,7 +123,7 @@ func (g *GPRMC) Parse(r *Raw) error {
 	if r.Fields[0] != "" {
 		g.Time, err = time.ParseInLocation(timeFormat, r.Fields[0], time.UTC)
 		if err != nil {
-			return fmt.Errorf("parse timestamp:", err)
+			return fmt.Errorf("parse timestamp: %s", err)
 		}
 	} else {
 		g.Time = time.Time{}
@@ -107,43 +142,13 @@ func (g *GPRMC) Parse(r *Raw) error {
 		g.Active = false
 	}
 
-	var dir CoordDirection
-	if r.Fields[2] != "" {
-		switch r.Fields[3] {
-		case "N":
-			dir = CoordDirectionNorth
-		case "S":
-			dir = CoordDirectionSouth
-		default:
-			return fmt.Errorf("invalid or missing direction for latitude")
-		}
-		g.Latitude, err = ParseCoord(r.Fields[2], dir)
-		if err != nil {
-			return fmt.Errorf("parse latitude: %s", err)
-		}
-	} else if r.Fields[3] != "" {
-		return fmt.Errorf("got direction for latitude, but no latitude value")
-	} else {
-		g.Latitude = 0
+	g.Latitude, err = parseFieldCoord(r.Fields[2], r.Fields[3], "latitude")
+	if err != nil {
+		return err
 	}
-
-	if r.Fields[4] != "" {
-		switch r.Fields[5] {
-		case "E":
-			dir = CoordDirectionEast
-		case "W":
-			dir = CoordDirectionWest
-		default:
-			return fmt.Errorf("invalid or missing direction for longitude")
-		}
-		g.Longitude, err = ParseCoord(r.Fields[4], dir)
-		if err != nil {
-			return fmt.Errorf("parse longitude: %s", err)
-		}
-	} else if r.Fields[5] != "" {
-		return fmt.Errorf("got direction for longitude, but no longitude value")
-	} else {
-		g.Longitude = 0
+	g.Longitude, err = parseFieldCoord(r.Fields[4], r.Fields[5], "longitude")
+	if err != nil {
+		return err
 	}
 
 	if r.Fields[6] != "" {
@@ -164,8 +169,9 @@ func (g *GPRMC) Parse(r *Raw) error {
 		g.TrueCourse = 0
 	}
 
+	var t time.Time
 	if r.Fields[8] != "" {
-		t, err := time.ParseInLocation(dateFormat, r.Fields[8], time.UTC)
+		t, err = time.ParseInLocation(dateFormat, r.Fields[8], time.UTC)
 		if err != nil {
 			return fmt.Errorf("parse date: %s", err)
 		}
@@ -173,23 +179,9 @@ func (g *GPRMC) Parse(r *Raw) error {
 		g.Time = t.Add(time.Hour*time.Duration(g.Time.Hour()) + time.Minute*time.Duration(g.Time.Minute()) + time.Second*time.Duration(g.Time.Second()) + time.Duration(g.Time.Nanosecond()))
 	}
 
-	if r.Fields[9] != "" {
-		switch r.Fields[10] {
-		case "E":
-			dir = CoordDirectionEast
-		case "W":
-			dir = CoordDirectionWest
-		default:
-			return fmt.Errorf("invalid or missing direction for variation")
-		}
-		g.Variation, err = ParseCoord(r.Fields[9], dir)
-		if err != nil {
-			return fmt.Errorf("parse variation: %s", err)
-		}
-	} else if r.Fields[10] != "" {
-		return fmt.Errorf("got direction for variation, but no variation value")
-	} else {
-		g.Variation = 0
+	g.Variation, err = parseFieldCoord(r.Fields[9], r.Fields[10], "variation")
+	if err != nil {
+		return err
 	}
 
 	if len(r.Fields) >= 12 && r.Fields[11] != "" {
