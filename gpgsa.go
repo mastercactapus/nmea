@@ -8,6 +8,7 @@ import (
 // GPGSAFix is the fix type for a GPGSA sentence
 type GPGSAFix string
 
+// Fix types for GPGSA
 const (
 	GPGSAFixNoFix GPGSAFix = "1"
 	GPGSAFix2D    GPGSAFix = "2"
@@ -33,6 +34,11 @@ type GPGSA struct {
 
 	// VDOP is the vertical dilution of precision
 	VDOP float64
+}
+
+// Type returns TypeGPGSA to fulfill the Sentence interface
+func (g GPGSA) Type() Type {
+	return TypeGPGSA
 }
 
 // String will provide a NMEA formatted string. If more than 12 Satellites are present, only the first 12 will be serialized

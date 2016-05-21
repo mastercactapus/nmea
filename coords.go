@@ -10,10 +10,18 @@ import (
 type CoordDirection bool
 
 const (
+
+	// CoordDirectionNorth represents N for latitude coordinates
 	CoordDirectionNorth CoordDirection = true
-	CoordDirectionEast  CoordDirection = true
+
+	// CoordDirectionEast represents E for longitude coordinates
+	CoordDirectionEast CoordDirection = true
+
+	// CoordDirectionSouth represents S for latitude coordinates
 	CoordDirectionSouth CoordDirection = false
-	CoordDirectionWest  CoordDirection = false
+
+	// CoordDirectionWest represents W for longitude coordinates
+	CoordDirectionWest CoordDirection = false
 )
 
 // LatString will return the direction string for latitude (N or S)
@@ -32,7 +40,7 @@ func (c CoordDirection) LongString() string {
 	return "W"
 }
 
-// a Coord represents a geographic coordinate
+// Coord represents a geographic coordinate
 type Coord float64
 
 // CoordFromDD will return a Coord from Decimal Degrees and direction
@@ -97,6 +105,7 @@ func (c Coord) DDM() (deg, min float64, dir CoordDirection) {
 	return deg, min, dir
 }
 
+// ParseCoord will parse a NMEA formatted coordinate and direction into a Coord
 func ParseCoord(c string, dir CoordDirection) (Coord, error) {
 	if len(c) < 3 {
 		deg, err := strconv.ParseFloat(c, 64)

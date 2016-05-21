@@ -11,18 +11,22 @@ import (
 // Type corresponds to a sentence type
 type Type string
 
+// ErrUnknownType is used when a sentence type is unknown or currently unsupported
 var ErrUnknownType = errors.New("unknown sentence type")
 
+// Supported NMEA sentence types
 const (
 	TypeGPRMC Type = "GPRMC"
 	TypeGPGSA Type = "GPGSA"
 )
 
+// Sentence is a NMEA sentence
 type Sentence interface {
 	Type() Type
 	String() string
 }
 
+// Raw is a NMEA sentence that has been broken up into its TypeName and Fields. Checksums are handled automatically
 type Raw struct {
 	TypeName string
 	Fields   []string
@@ -59,7 +63,7 @@ func ParseRaw(line []byte) (*Raw, error) {
 	line = line[1:]
 	if len(line) >= 3 && line[len(line)-3] == '*' {
 		checkStr := bytes.ToUpper(line[len(line)-2:])
-		check := byte((checkStr[0]-48)*16 + (checkStr[1] - 48))
+		check := (checkStr[0]-48)*16 + (checkStr[1] - 48)
 		line = line[:len(line)-3]
 		if Checksum(line) != check {
 			return nil, fmt.Errorf("checksum: expected 0x%02x but found 0x%02x", Checksum(line), check)
