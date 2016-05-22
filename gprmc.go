@@ -24,26 +24,14 @@ const (
 
 // GPRMC represents a GPRMC type NMEA sentence
 type GPRMC struct {
-	// Time is the time/date of the fix
-	Time time.Time
-
-	// Active will be true if the unit reports the fix as valid
-	Active bool
-
-	Latitude  Coord
-	Longitude Coord
-
-	// Speed in knots
-	Speed float64
-
-	// TrueCourse -- track made good in degrees True
-	TrueCourse float64
-
-	// Var is the magnetic variation
-	Variation Coord
-
-	// FixType is the type of fix the receiver has
-	FixType GPRMCFix
+	Time       time.Time // the time/date of the fix
+	Active     bool      // true if the unit reports the fix as valid/active (Void otherwise)
+	Latitude   Coord
+	Longitude  Coord
+	Speed      float64  // Speed in knots
+	TrueCourse float64  // track made good in degrees True
+	Variation  Coord    //  magnetic variation
+	FixType    GPRMCFix // type of fix the receiver has
 }
 
 // Type returns TypeGPRMC to fulfill the Sentence interface
