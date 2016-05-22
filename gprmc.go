@@ -141,16 +141,10 @@ func (g *GPRMC) Parse(r *Raw) error {
 
 	if len(r.Fields) >= 12 && r.Fields[11] != "" {
 		switch GPRMCFix(r.Fields[11]) {
-		case GPRMCFixAutonomous, GPRMCFixDifferential:
-			if !g.Active {
-				return fmt.Errorf("fix type mismatched with status")
-			}
-			g.FixType = GPRMCFix(r.Fields[11][0])
-		case GPRMCFixEstimated, GPRMCFixNotValid, GPRMCFixSimulator:
-			if !g.Active {
-				return fmt.Errorf("fix type mismatched with status")
-			}
-			g.FixType = GPRMCFix(r.Fields[11][0])
+		case GPRMCFixAutonomous, GPRMCFixDifferential, GPRMCFixEstimated,
+			GPRMCFixNotValid, GPRMCFixSimulator:
+
+			g.FixType = GPRMCFix(r.Fields[11])
 		default:
 			return fmt.Errorf("unknown fix type value: %s", r.Fields[11])
 		}
