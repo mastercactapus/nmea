@@ -11,7 +11,7 @@ See [gps_exporter](https://github.com/mastercactapus/gps_exporter) for example u
 Get the latest version with:
 
 ```bash
-go get -u github.com/mastercactapus/nmea`
+go get -u github.com/mastercactapus/nmea
 ```
 
 ## Supported
