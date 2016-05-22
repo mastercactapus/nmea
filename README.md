@@ -10,7 +10,7 @@ Get the latest version with:
 go get -u github.com/mastercactapus/nmea`
 ```
 
-See the [go doc](https://godoc.org/github.com/mastercactapus/nmea)
+See the [go doc](https://godoc.org/github.com/mastercactapus/nmea) for documentation.
 
 ## Supported
 
@@ -26,15 +26,17 @@ An example of parsing the timestamp from a GPRMC sentence:
 
 ```go
 
-res, err := Parse([]byte("$GPRMC,232158.000,A,1445.1076,N,02315.4367,W,0.27,232.04,190516,,,D*79"))
+import "github.com/mastercactapus/nmea"
+
+res, err := nmea.Parse([]byte("$GPRMC,232158.000,A,1445.1076,N,02315.4367,W,0.27,232.04,190516,,,D*79"))
 if err != nil {
     panic(err)
 }
-if res.Type() != TypeGPRMC {
+if res.Type() != nmea.TypeGPRMC {
     panic("bad type")
 }
 
-fmt.Println(res.(*GPRMC).Time.String())
+fmt.Println(res.(*nmea.GPRMC).Time.String())
 
 // Output: 2016-05-19 23:21:58 +0000 UTC
 ```
