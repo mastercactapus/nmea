@@ -17,23 +17,12 @@ const (
 
 // GPGSA is used to communicate dilution of precision and active satellites
 type GPGSA struct {
-	// AutoSelection specifies if selection of 2D vs 3D fix is automatic or manual
-	AutoSelection bool
-
-	// Fix type is the type of fix the receiver has
-	FixType GPGSAFix
-
-	// PRNs of satellites used for fix. Maximum of 12
-	Satellites []string
-
-	// PDOP is the dilution of precision
-	PDOP float64
-
-	// HDOP is the horizontal dilution of precision
-	HDOP float64
-
-	// VDOP is the vertical dilution of precision
-	VDOP float64
+	AutoSelection bool     // specifies if selection of 2D vs 3D fix is automatic or manual
+	FixType       GPGSAFix // the type of fix the receiver has
+	Satellites    []string // PRNs of satellites used for fix. Maximum of 12
+	PDOP          float64  // dilution of precision
+	HDOP          float64  // horizontal dilution of precision
+	VDOP          float64  // vertical dilution of precision
 }
 
 // Type returns TypeGPGSA to fulfill the Sentence interface
@@ -83,10 +72,10 @@ func (g *GPGSA) Parse(r *Raw) error {
 		return fmt.Errorf("invalid selection type: %s", r.Fields[0])
 	}
 
-	switch r.Fields[1] {
-	case string(GPGSAFix2D), string(GPGSAFix3D), string(GPGSAFixNoFix):
+	switch GPGSAFix(r.Fields[1]) {
+	case GPGSAFix2D, GPGSAFix3D, GPGSAFixNoFix:
 		g.FixType = GPGSAFix(r.Fields[1])
-	case "":
+	case GPGSAFix(""):
 		g.FixType = GPGSAFixNoFix
 	default:
 		return fmt.Errorf("invalid fix type: %s", r.Fields[1])
@@ -101,17 +90,19 @@ func (g *GPGSA) Parse(r *Raw) error {
 	}
 
 	var err error
-	g.PDOP, err = strconv.ParseFloat(r.Fields[14], 64)
+	g.PDOP, err = parseFieldFloat(r.Fields[14], "PDOP")
 	if err != nil {
-		return fmt.Errorf("parse PDOP: %s", err)
+		return err
 	}
-	g.HDOP, err = strconv.ParseFloat(r.Fields[15], 64)
+
+	g.HDOP, err = parseFieldFloat(r.Fields[15], "HDOP")
 	if err != nil {
-		return fmt.Errorf("parse HDOP: %s", err)
+		return err
 	}
-	g.VDOP, err = strconv.ParseFloat(r.Fields[16], 64)
+
+	g.VDOP, err = parseFieldFloat(r.Fields[16], "VDOP")
 	if err != nil {
-		return fmt.Errorf("parse VDOP: %s", err)
+		return err
 	}
 
 	return nil
