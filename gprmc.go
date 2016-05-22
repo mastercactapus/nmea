@@ -66,39 +66,6 @@ func (g GPRMC) String() string {
 	}.String()
 }
 
-func parseFieldCoord(val, dirStr, typeName string) (Coord, error) {
-	var dir CoordDirection
-	if val != "" {
-		if typeName == "latitude" {
-			switch dirStr {
-			case "N":
-				dir = CoordDirectionNorth
-			case "S":
-				dir = CoordDirectionSouth
-			default:
-				return 0, fmt.Errorf("invalid or missing direction for %s", typeName)
-			}
-		} else {
-			switch dirStr {
-			case "E":
-				dir = CoordDirectionEast
-			case "W":
-				dir = CoordDirectionWest
-			default:
-				return 0, fmt.Errorf("invalid or missing direction for %s", typeName)
-			}
-		}
-		c, err := ParseCoord(val, dir)
-		if err != nil {
-			return 0, fmt.Errorf("parse %s: %s", typeName, err)
-		}
-		return c, nil
-	} else if dirStr != "" {
-		return 0, fmt.Errorf("got direction for %s, but no %s value", typeName, typeName)
-	}
-	return 0, nil
-}
-
 // Parse will parse GPRMC data from a raw sentence struct
 func (g *GPRMC) Parse(r *Raw) error {
 	if r.TypeName != string(TypeGPRMC) {
