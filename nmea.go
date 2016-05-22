@@ -19,6 +19,7 @@ var ErrUnknownType = errors.New("unknown sentence type")
 const (
 	TypeGPRMC Type = "GPRMC"
 	TypeGPGSA Type = "GPGSA"
+	TypeGPGGA Type = "GPGGA"
 )
 
 // Sentence is a NMEA sentence
@@ -99,6 +100,9 @@ func Parse(line []byte) (Sentence, error) {
 		return s, s.Parse(r)
 	case TypeGPGSA:
 		s := new(GPGSA)
+		return s, s.Parse(r)
+	case TypeGPGGA:
+		s := new(GPGGA)
 		return s, s.Parse(r)
 	default:
 		return nil, ErrUnknownType
