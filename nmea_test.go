@@ -38,3 +38,7 @@ func ExampleParse_string() {
 	fmt.Println(res.(*GPRMC).Time.String())
 	// Output: 2016-05-19 23:21:58 +0000 UTC
 }
+
+func TestChecksum(t *testing.T) {
+	assert.Equal(t, byte(0x16), Checksum([]byte("test")))
+}

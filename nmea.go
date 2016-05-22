@@ -2,6 +2,7 @@ package nmea
 
 import (
 	"bytes"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -62,11 +63,15 @@ func ParseRaw(line []byte) (*Raw, error) {
 	}
 	line = line[1:]
 	if len(line) >= 3 && line[len(line)-3] == '*' {
-		checkStr := bytes.ToUpper(line[len(line)-2:])
-		check := (checkStr[0]-48)*16 + (checkStr[1] - 48)
+		check := make([]byte, 1)
+		_, err := hex.Decode(check, line[len(line)-2:])
+		if err != nil {
+			return nil, fmt.Errorf("parse checksum: %s", err)
+		}
+
 		line = line[:len(line)-3]
-		if Checksum(line) != check {
-			return nil, fmt.Errorf("checksum: expected 0x%02x but found 0x%02x", Checksum(line), check)
+		if Checksum(line) != check[0] {
+			return nil, fmt.Errorf("checksum: expected 0x%02x but found 0x%02x", Checksum(line), check[0])
 		}
 	}
 	fields := make([]string, 0, 20)
