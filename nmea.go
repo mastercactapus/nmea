@@ -97,6 +97,9 @@ func Parse(line []byte) (Sentence, error) {
 	case TypeGPRMC:
 		s := new(GPRMC)
 		return s, s.Parse(r)
+	case TypeGPGSA:
+		s := new(GPGSA)
+		return s, s.Parse(r)
 	default:
 		return nil, ErrUnknownType
 	}
