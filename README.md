@@ -1,6 +1,10 @@
 # nmea
 
+[![go-doc](https://godoc.org/github.com/mastercactapus/nmea?status.svg)](https://godoc.org/github.com/mastercactapus/nmea)
+
 A NMEA parsing library for go
+
+See [gps_exporter](https://github.com/mastercactapus/gps_exporter) for example usage.
 
 ## Installation
 
@@ -9,8 +13,6 @@ Get the latest version with:
 ```bash
 go get -u github.com/mastercactapus/nmea`
 ```
-
-See the [go doc](https://godoc.org/github.com/mastercactapus/nmea) for documentation.
 
 ## Supported
 
