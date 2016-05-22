@@ -1,9 +1,9 @@
 package nmea
 
 import (
-	"fmt"
 	"math"
 	"strconv"
+	"strings"
 )
 
 // CoordDirection specifies a hemesphere
@@ -71,10 +71,14 @@ func CoordFromDDM(deg, min float64, dir CoordDirection) Coord {
 
 // DD will return Decimal Degrees and direction
 func (c Coord) DD() (deg float64, dir CoordDirection) {
-	if c >= 0 {
+	val := float64(c)
+	if val < 0 {
+		val = -val
+	} else {
 		dir = true
 	}
-	return float64(c), dir
+
+	return val, dir
 }
 
 // DMS will return Degrees, Minutes, Seconds and direction
@@ -128,7 +132,17 @@ func ParseCoord(c string, dir CoordDirection) (Coord, error) {
 // StringLat will return the coordinate as a NMEA-formatted string
 func (c Coord) String() string {
 	deg, min, _ := c.DDM()
-	return fmt.Sprintf("%02.0f%02f", deg, min)
+	degI := int(deg)
+	degStr := strconv.Itoa(degI)
+	if degI < 10 {
+		degStr = "0" + degStr
+	}
+	minStr := strconv.FormatFloat(min, 'f', 9, 64)
+	if strings.IndexByte(minStr, '.') == 1 {
+		minStr = "0" + minStr
+	}
+
+	return strings.TrimRight(degStr+minStr, "0")
 }
 
 // Direction will return the direction of the coordinate

@@ -31,12 +31,12 @@ func TestGPRMC_Parse(t *testing.T) {
 }
 
 func TestGPRMC_String(t *testing.T) {
-	now, err := time.ParseInLocation("1/2/06 15:04:05", "1/2/03 4:05:06", time.UTC)
+	tm, err := time.ParseInLocation("1/2/06 15:04:05", "1/2/03 4:05:06", time.UTC)
 	if err != nil {
 		panic(err)
 	}
 	str := GPRMC{
-		Time:       now,
+		Time:       tm,
 		Active:     true,
 		Latitude:   Coord(14.654321),
 		Longitude:  Coord(20.321098),
@@ -46,5 +46,5 @@ func TestGPRMC_String(t *testing.T) {
 		FixType:    GPRMCFixSimulator,
 	}.String()
 
-	assert.Equal(t, "$GPRMC,040506,A,1439.259260,N,2019.265880,E,12.4,13,020103,3059.259240,W,S*3E", str)
+	assert.Equal(t, "$GPRMC,040506,A,1439.25926,N,2019.26588,E,12.4,13,020103,3059.25924,W,S*0E", str)
 }
